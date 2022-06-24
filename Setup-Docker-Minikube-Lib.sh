@@ -78,7 +78,7 @@ function getEnv() {
 # RETURN:
 #   0 if succeeds, 1 on error.
 #######################################
-function minikube() {
+function __minikube() {
     if ! __check_for_req_vars; then exit 1; fi
     case "$UNAME" in 
         Linux | Darwin)
@@ -105,17 +105,17 @@ function minikube() {
 function startMinikube() {
     if ! __check_for_req_vars; then exit 1; fi
     #check status of minikube
-    if ! minikube status &>> Setup-Docker-Minikube-Log.txt; then
+    if ! __minikube status &>> Setup-Docker-Minikube-Log.txt; then
         echo "Minikube not running..."
         #check status of docker
         if ! docker info &>> Setup-Docker-Minikube-Log.txt; then
             echo "docker not running...";
             startDocker
         fi
-        minikube start
+        __minikube start
     fi
 
-    eval $(minikube docker-env --shell bash) &>> Setup-Docker-Minikube-Log.txt 
+    eval $(__minikube docker-env --shell bash) &>> Setup-Docker-Minikube-Log.txt 
     if [[ $UNAME == wsl ]]; then 
         #convert windows path to wsl path
         DOCKER_CERT_PATH=$(wslpath -a $DOCKER_CERT_PATH)
@@ -127,7 +127,7 @@ function startMinikube() {
         echo -e "\r\033[2K${CHECK_MARK} kubectl configured for wsl."
     fi
 
-    waitPrompt "minikube status" "Minikube Running"
+    waitPrompt "__minikube status" "Minikube Running"
 }
 
 #######################################
