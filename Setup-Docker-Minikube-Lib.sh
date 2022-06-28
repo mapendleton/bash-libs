@@ -19,7 +19,7 @@ CROSS_MARK="\u274c"
 # RETURN:
 #   0 if succeeds, non-zero on error.
 #######################################
-function waitPrompt() {
+function wait_prompt() {
     echo -n "Executing command : '$1'"
     if [[ -z $3 ]]; then
         timeout=100
@@ -58,7 +58,7 @@ function waitPrompt() {
 # RETURN:
 #   0 if succeeds, non-zero on error.
 #######################################
-function getEnv() {
+function get_env() {
     if grep -iEq "(microsoft|wsl)" /proc/version &> /dev/null; then
         UNAME="wsl"
         export PATH="/mnt/c/minikube:$PATH"
@@ -95,7 +95,7 @@ function __minikube() {
 #######################################
 # Will attempt to run minikube and configure kubectl, if it's not running
 # Will also start docker/colima if not running
-# calls function startDocker() if docker is not running
+# calls function start_docker() if docker is not running
 # GLOBALS:
 #   DOCKER_CERT_PATH
 #   KUBECONFIG
@@ -103,7 +103,7 @@ function __minikube() {
 # RETURN:
 #   0 if succeeds, 1 on error.
 #######################################
-function startMinikube() {
+function start_minikube() {
     if ! __check_for_req_vars; then exit 1; fi
     #check status of minikube
     if ! __minikube status >> Setup-Docker-Minikube-Log.txt 2>&1; then
@@ -111,7 +111,7 @@ function startMinikube() {
         #check status of docker
         if ! docker info >> Setup-Docker-Minikube-Log.txt 2>&1; then
             echo "docker not running...";
-            startDocker
+            start_docker
         fi
         __minikube start --ports=127.0.0.1:30080:30080
     fi
@@ -128,7 +128,7 @@ function startMinikube() {
         echo -e "\r\033[2K${CHECK_MARK} kubectl configured for wsl."
     fi
 
-    waitPrompt "__minikube status" "Minikube Running"
+    wait_prompt "__minikube status" "Minikube Running"
 }
 
 #######################################
@@ -138,7 +138,7 @@ function startMinikube() {
 # RETURN:
 #   0 if succeeds, 1 on error.
 #######################################
-function startDocker() {
+function start_docker() {
     if ! __check_for_req_vars; then exit 1; fi
     case "$UNAME" in 
     Darwin)
@@ -152,7 +152,7 @@ function startDocker() {
         exit 1;;
     esac
 
-    waitPrompt "docker info" "Docker Started"
+    wait_prompt "docker info" "Docker Started"
 }
 
 #######################################
@@ -162,7 +162,7 @@ function startDocker() {
 #######################################
 function __check_for_req_vars() {
     if [[ -z $UNAME ]]; then
-        echo "var UNAME must be set. Run function 'getEnv()'"
+        echo "var UNAME must be set. Run function 'get_env()'"
         exit 1
     fi
 }
