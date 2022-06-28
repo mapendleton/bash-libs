@@ -32,11 +32,11 @@ function waitPrompt() {
         echo -en "\b\b\b\033[0K"
         sleep 0.5
         ((timeout-=1))
-        if $1 &>> Setup-Docker-Minikube-Log.txt; then 
+        if $1 2>&1 > Setup-Docker-Minikube-Log.txt; then
             echo -e "\r\033[2K${CHECK_MARK} $2"
             break 
         else
-            echo $? &>> Setup-Docker-Minikube-Log.txt
+            echo $? >> Setup-Docker-Minikube-Log.txt 2>&1
         fi
 
         if [[ timeout -le 0 ]]; then 
@@ -63,7 +63,8 @@ function getEnv() {
         UNAME="wsl"
         export PATH="/mnt/c/minikube:$PATH"
         export DOCKER_HOST="unix:///var/run/docker.sock"
-    else 
+    else
+        echo assuming env build for mac...
         UNAME="$(uname -s)"
     fi
 
@@ -105,17 +106,17 @@ function __minikube() {
 function startMinikube() {
     if ! __check_for_req_vars; then exit 1; fi
     #check status of minikube
-    if ! __minikube status &>> Setup-Docker-Minikube-Log.txt; then
+    if ! __minikube status >> Setup-Docker-Minikube-Log.txt 2>&1; then
         echo "Minikube not running..."
         #check status of docker
-        if ! docker info &>> Setup-Docker-Minikube-Log.txt; then
+        if ! docker info >> Setup-Docker-Minikube-Log.txt 2>&1; then
             echo "docker not running...";
             startDocker
         fi
         __minikube start --ports=127.0.0.1:30080:30080
     fi
 
-    eval $(__minikube docker-env --shell bash) &>> Setup-Docker-Minikube-Log.txt 
+    eval $(__minikube docker-env --shell bash) >> Setup-Docker-Minikube-Log.txt 2>&1
     if [[ $UNAME == wsl ]]; then 
         #convert windows path to wsl path
         DOCKER_CERT_PATH=$(wslpath -a $DOCKER_CERT_PATH)
