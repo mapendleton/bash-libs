@@ -112,7 +112,7 @@ function startMinikube() {
             echo "docker not running...";
             startDocker
         fi
-        __minikube start
+        __minikube start --ports=127.0.0.1:30080:30080
     fi
 
     eval $(__minikube docker-env --shell bash) &>> Setup-Docker-Minikube-Log.txt 
